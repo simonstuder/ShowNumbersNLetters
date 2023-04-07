@@ -354,6 +354,7 @@ MuseScore {
             anchors.margins: 4
             columns: 2
 
+            /*
             CheckBox {
                 id: showNumbersCheckBox
                 checked: true
@@ -371,6 +372,7 @@ MuseScore {
                     text: "Show Numbers"
                 }
             }
+            */
 
             CheckBox {
                 id: hideRepeatingValuesCheckBox
