@@ -69,25 +69,29 @@ MuseScore {
         console.log("update staff "+staffIndex)
         var cursor = curScore.newCursor()
 
-        cursor.rewind(0)
+        var staff = getStaffFromInd(staffIndex)
+
+        if (!staff.part.hasPitchedStaff) {
+            return
+        }
+
         cursor.voice = 0
         cursor.staffIdx = staffIndex
+        cursor.rewind(0)
+
+        // brass.trombone, brass.euphonium, brass.sousaphone, brass.trumpet
+        var instrumentId = staff.part.instruments[0].instrumentId
+        console.log("instrumentId "+instrumentId)
 
         var last_text = ""
 
         while (cursor.segment) {
             if (cursor.element.type == Element.CHORD) {
                 var notes = cursor.element.notes
-                var otherNotes = []
                 var lowestNote
                 var lowestPitch = 1000
                 for (var i=0; i<notes.length; i++) {
                     var n = notes[i]
-                    var hasTieBack = n.tieBack != null
-                    if (hasTieBack) {
-                        otherNotes.push(n)
-                        continue
-                    }
                     var tpc = n.tpc
                     var pitch = n.pitch + 0
                     var tpitch = pitch + (n.tpc2-n.tpc1)
@@ -98,18 +102,11 @@ MuseScore {
                 }
                 if (lowestNote) {
                     var text = (lowestPitch).toString()
-                    console.log(text)
-                    if (!hideRepeatingValuesCheckBox.checked || text != last_text) {
+                    var hasTieBack = lowestNote.tieBack != null
+                    if ((!hideRepeatingValuesCheckBox.checked || text != last_text) && !hasTieBack) {
                         last_text = text
                         text = text.toString().split("").join("\n")
-                        updateNoteText(cursor,text,lowestNote)
-                    } else {
-                        removeNoteText(cursor)
-                    }
-                }
-                for (var i=0; i<notes.length; i++) {
-                    if (n!=lowestNote) {
-                        removeNoteText(cursor)
+                        insertNoteText(cursor,text,lowestNote)
                     }
                 }
             }
@@ -128,32 +125,10 @@ MuseScore {
         }
     }
 
-    function updateNoteText(cur,text,note) {
-        var an = undefined
-        for (var i=0; i<cur.segment.annotations.length; i++) {
-            var a = cur.segment.annotations[i]
-            if (a.name == "FiguredBass") {
-                if (an) {
-                    // delete annotation
-                    console.log("remove additional annotation")
-                    removeElement(a)
-                } else {
-                    an = a
-                }
-            }
-        }
-        if (!an) {
-            console.log("annotation not found, adding")
-            var textEl = newElement(Element.FIGURED_BASS) 
-            textEl.text = text
-            cur.add(textEl)
-        } else {
-            console.log("annotation found")
-            if (an.text != text) {
-                console.log("updating to "+text)
-                an.text = text
-            }
-        }
+    function insertNoteText(cur,text,note) {
+        var textEl = newElement(Element.FIGURED_BASS) 
+        textEl.text = text
+        cur.add(textEl)
     }
 
     function removeAll() {
@@ -163,20 +138,33 @@ MuseScore {
         updating = true
         console.log("remove")
         curScore.startCmd()
-        removeStaff(0)
+
+        var selectedStaffs = getSelectedStaffsOrAllInd()
+        console.log("selected staffs "+selectedStaffs)
+        for (var i=0; i<selectedStaffs.length; i++) {
+            removeStaff(selectedStaffs[i])
+        }
+
         curScore.endCmd()
         console.log("remove end")
         updating = false
     }
 
     function updateAll() {
+        removeAll()
         if (updating) {
             return
         }
         updating = true
         console.log("update")
         curScore.startCmd()
-        updateStaff(0)
+
+        var selectedStaffs = getSelectedStaffsOrAllInd()
+        console.log("selected staffs "+selectedStaffs)
+        for (var i=0; i<selectedStaffs.length; i++) {
+            updateStaff(selectedStaffs[i])
+        }
+
         curScore.endCmd()
         console.log("update end")
         updating = false
