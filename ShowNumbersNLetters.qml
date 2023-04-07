@@ -51,6 +51,20 @@ MuseScore {
         }
     }
 
+    function removeStaff(staffIndex) {
+        console.log("remove staff "+staffIndex)
+        var cursor = curScore.newCursor()
+
+        cursor.rewind(0)
+        cursor.voice = 0
+        cursor.staffIdx = staffIndex
+
+        while (cursor.segment) {
+            removeNoteText(cursor)
+            cursor.next()
+        }
+    }
+
     function updateStaff(staffIndex) {
         console.log("update staff "+staffIndex)
         var cursor = curScore.newCursor()
@@ -140,6 +154,19 @@ MuseScore {
                 an.text = text
             }
         }
+    }
+
+    function removeAll() {
+        if (updating) {
+            return
+        }
+        updating = true
+        console.log("remove")
+        curScore.startCmd()
+        removeStaff(0)
+        curScore.endCmd()
+        console.log("remove end")
+        updating = false
     }
 
     function updateAll() {
@@ -377,6 +404,15 @@ MuseScore {
                 anchors.topMargin: 4
                 text: "Update"
                 onClicked: updateAll()
+            }
+
+            Button {
+                id: removeButton
+                anchors.top: updateButton.top
+                anchors.left: updateButton.right
+                anchors.leftMargin: 4
+                text: "Remove"
+                onClicked: removeAll()
             }
 
         }
