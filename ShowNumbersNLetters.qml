@@ -85,7 +85,7 @@ MuseScore {
                 if (lowestNote) {
                     var text = (lowestPitch).toString()
                     console.log(text)
-                    if (text != last_text) {
+                    if (!hideRepeatingValuesCheckBox.checked || text != last_text) {
                         last_text = text
                         text = text.toString().split("").join("\n")
                         updateNoteText(cursor,text,lowestNote)
@@ -349,9 +349,31 @@ MuseScore {
                 }
             }
 
+            Control {
+                id: hideRepeatingValuesControl
+                height: childrenRect.height
+                anchors.top: showNumbersControl.bottom
+                anchors.topMargin: 4
+
+                CheckBox {
+                    id: hideRepeatingValuesCheckBox
+                    checked: true
+                    text: "Hide repeating values"
+                    onCheckedChanged: function () {
+                        updateAll()
+                    }
+                }
+                Label {
+                    text: "Hide repeating values"
+                    anchors.left: hideRepeatingValuesCheckBox.right
+                    anchors.leftMargin: 2
+                    color: "#DDD"
+                }
+            }
+
             Button {
                 id: updateButton
-                anchors.top: showNumbersControl.bottom
+                anchors.top: hideRepeatingValuesControl.bottom
                 anchors.topMargin: 4
                 text: "Update"
                 onClicked: updateAll()
