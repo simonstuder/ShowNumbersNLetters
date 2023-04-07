@@ -51,17 +51,19 @@ MuseScore {
         }
     }
 
-    function removeStaff(staffIndex) {
-        console.log("remove staff "+staffIndex)
+    function removeAllStaffs() {
+        console.log("remove all staffs")
         var cursor = curScore.newCursor()
 
-        cursor.rewind(0)
-        cursor.voice = 0
-        cursor.staffIdx = staffIndex
+        for (var i=0; i<curScore.nstaves; i++) {
+            cursor.rewind(0)
+            cursor.voice = 0
+            cursor.staffIdx = i
 
-        while (cursor.segment) {
-            removeNoteText(cursor)
-            cursor.next()
+            while (cursor.segment) {
+                removeNoteText(cursor)
+                cursor.next()
+            }
         }
     }
 
@@ -141,9 +143,7 @@ MuseScore {
 
         var selectedStaffs = getSelectedStaffsOrAllInd()
         console.log("selected staffs "+selectedStaffs)
-        for (var i=0; i<selectedStaffs.length; i++) {
-            removeStaff(selectedStaffs[i])
-        }
+        removeAllStaffs()
 
         curScore.endCmd()
         console.log("remove end")
