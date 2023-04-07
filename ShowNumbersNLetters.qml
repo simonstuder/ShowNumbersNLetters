@@ -1,6 +1,7 @@
 import QtQuick 2.2
 import QtQuick.Dialogs 1.0
 import QtQuick.Controls 2.0
+import QtQuick.Layouts 1.1
 import MuseScore 3.0
 import FileIO 3.0
 
@@ -137,6 +138,9 @@ MuseScore {
     function insertNoteText(cur,text,note) {
         var textEl = newElement(Element.FIGURED_BASS) 
         textEl.text = text
+        //textEl.fontFace: 'MScore Text'
+        //textEl.fontSize: 18
+        //showObject(textEl)
         cur.add(textEl)
     }
 
@@ -341,75 +345,67 @@ MuseScore {
         return selectedStaffs
     }
 
-    Control {
-        id: mainControl
-        width: childrenRect.width
-        height: parent.height
+    GridLayout {
+        anchors.margins:10
+        columns: 1
 
-        Rectangle {
-            id: backgroundRect
-            width: childrenRect.width
-            height: parent.height
+        GridLayout {
+            id: settingsContainer
+            anchors.margins: 4
+            columns: 2
 
-            Control {
-                id: showNumbersControl
-                height: childrenRect.height
-
-                CheckBox {
-                    id: showNumbersCheckBox
-                    checked: true
-                    text: "Show Numbers"
-                    onCheckedChanged: function () {
-                        console.log("changed showNumbers")
-                    }
+            CheckBox {
+                id: showNumbersCheckBox
+                checked: true
+                onCheckedChanged: function () {
+                    console.log("changed showNumbers")
                 }
+            }
+            Rectangle {
+                width: childrenRect.width + 20
+                height: childrenRect.height + 10
+
                 Label {
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    anchors.verticalCenter: parent.verticalCenter
                     text: "Show Numbers"
-                    anchors.left: showNumbersCheckBox.right
-                    anchors.leftMargin: 2
-                    color: "#DDD"
                 }
             }
 
-            Control {
-                id: hideRepeatingValuesControl
-                height: childrenRect.height
-                anchors.top: showNumbersControl.bottom
-                anchors.topMargin: 4
-
-                CheckBox {
-                    id: hideRepeatingValuesCheckBox
-                    checked: true
-                    text: "Hide repeating values"
-                    onCheckedChanged: function () {
-                        updateAll()
-                    }
-                }
-                Label {
-                    text: "Hide repeating values"
-                    anchors.left: hideRepeatingValuesCheckBox.right
-                    anchors.leftMargin: 2
-                    color: "#DDD"
+            CheckBox {
+                id: hideRepeatingValuesCheckBox
+                checked: true
+                onCheckedChanged: function () {
+                    updateAll()
                 }
             }
+            Rectangle {
+                width: childrenRect.width + 20
+                height: childrenRect.height + 10
+
+                Label {
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    anchors.verticalCenter: parent.verticalCenter
+                    text: "Hide repeating values"
+                }
+            }
+
+        }
+
+        GridLayout {
+            rows: 1
 
             Button {
                 id: updateButton
-                anchors.top: hideRepeatingValuesControl.bottom
-                anchors.topMargin: 4
                 text: "Update"
                 onClicked: updateAll()
             }
 
             Button {
                 id: removeButton
-                anchors.top: updateButton.top
-                anchors.left: updateButton.right
-                anchors.leftMargin: 4
                 text: "Remove"
                 onClicked: removeAll()
             }
-
         }
     }
 
