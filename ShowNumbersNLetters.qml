@@ -85,6 +85,13 @@ MuseScore {
         var instrumentId = staff.part.instruments[0].instrumentId
         console.log("instrumentId "+instrumentId)
 
+        var instInd = numbersMapping["instrumentIds"].findIndex((e)=> e==instrumentId)
+        console.log(instInd)
+        if (instInd==-1) {
+            console.log("using default instrument at ind 0")
+            instInd = 0
+        }
+
         var last_text = ""
 
         while (cursor.segment) {
@@ -103,7 +110,7 @@ MuseScore {
                     }
                 }
                 if (lowestNote) {
-                    var text = (lowestPitch).toString()
+                    var text = numbersMapping[(lowestPitch).toString()][instInd]
                     var hasTieBack = lowestNote.tieBack != null
                     if ((!hideRepeatingValuesCheckBox.checked || text != last_text) && !hasTieBack) {
                         last_text = text
