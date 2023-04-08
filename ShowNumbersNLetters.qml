@@ -191,116 +191,6 @@ MuseScore {
         return c.element.staff
     }
 
-    function processStaffVoice(staff,voice, format) {
-
-        if (format==undefined) {
-            format = "txt"
-        }
-
-        var instrumentPitchOffset = 0
-        var sss = getStaffFromInd(staff)
-        if(sss.part.instruments[0].instrumentId.indexOf("brass.trombone")==0) {
-            instrumentPitchOffset = 12
-        } else if(sss.part.instruments[0].instrumentId.indexOf("brass.euphonium")==0) {
-            instrumentPitchOffset = 12
-        } else if(sss.part.instruments[0].instrumentId.indexOf("brass.sousaphone")==0) {
-            instrumentPitchOffset = 24
-        } else if(sss.part.instruments[0].instrumentId.indexOf("brass.trumpet")==0) {
-            instrumentPitchOffset = 0
-        } else {
-            console.log(sss.part.instruments[0].instrumentId)
-        }
-
-        var cur = curScore.newCursor()
-        cur.staffIdx = staff
-        cur.voice = voice 
-        cur.rewind(0)
-        
-        var score = cur.score
-        
-        var pH = new processHelper(score, sss)
-
-        
-        var  i = 0
-        while (cur.segment) {
-        
-            var nind = cur.segment.tick/division
-            
-            for (var j=0; j<cur.segment.annotations.length; j++) {
-                var an = cur.segment.annotations[j]
-                if (an.type==41) { // tempo annotation
-                } else if (an.type==42) {
-                    console.log("  staff text"+an.text)
-                    pH.newPart(an.text)
-                } else if (an.type==43) {
-                    //console.log("  system text "+an.text)
-                    pH.newPart(an.text)
-                } else {
-                    console.log("  ======> Annotation with type "+an.type+" "+an.userName())
-                }
-            }
-
-        
-            if (cur.element) {
-                if (cur.element.type==Element.CHORD) {
-                    /* TODO: handle multiple notes
-                    for (var j=0; j<cur.element.notes.length; j++) {
-                        var n = cur.element.notes[j]
-                        var pitch = n.pitch + instrumentPitchOffset
-                        var tpitch = pitch + (n.tpc2-n.tpc1)
-                    }
-                    */
-                    var n = cur.element.notes[0]
-                    var pitch = n.pitch + instrumentPitchOffset
-                    var tpitch = pitch + (n.tpc2-n.tpc1)
-                    if (n.tieBack!==null && n.tieBack.startNote.pitch==n.pitch) {
-                    } else {
-                        pH.newNote(nind, tpitch, cur.element.actualDuration, useSharps(cur))
-                    }
-                } else if (cur.element.type==Element.REST) {
-                    var duration = cur.element.actualDuration
-                    pH.newRest(nind,duration.numerator/duration.denominator)
-                } else {
-                    console.log("  ======> Other element of type "+cur.element.userName()+")")
-                }
-            } else {
-                console.log("No element")
-            }
-
-            var mes = cur.measure.elements
-            var m = cur.measure
-            for (var j=0; j<mes.length; j++) {
-                var me = mes[j]
-                if (me.type==Element.LAYOUT_BREAK) {
-                    pH.newLayoutBreak(m.lastSegment.tick/division)
-                    if (!m.lastSegment) {
-                    } else if (m.lastSegment.is(cur.segment)) {
-                    } else {
-                        var cs = m.firstSegment
-                        while (cs!=null) {
-                            cs = cs.nextInMeasure
-                        }
-                    }
-                } else {
-                    console.log("    =====> Other measure element "+m.name)
-                }
-            }
-            
-        
-            cur.next()
-            
-            /*
-            i = i+1
-            if (i>60) {
-                break
-            }
-            */
-        }
-
-        var o = pH.getOutput(format)
-        return o
-    }
-
     function getSelectedStaffsOrAllInd() {
         var selectedStaffs = []
         if (curScore.selection.elements.length>0) {
@@ -363,14 +253,14 @@ MuseScore {
                 Label {
                     anchors.horizontalCenter: parent.horizontalCenter
                     anchors.verticalCenter: parent.verticalCenter
-                    text: "Show Numbers"
+                    text: qsTr("Show Numbers")
                 }
             }
             */
 
             CheckBox {
                 id: hideRepeatingValuesCheckBox
-                checked: true
+                checked: false
                 onCheckedChanged: function () {
                     updateAll()
                 }
@@ -382,7 +272,7 @@ MuseScore {
                 Label {
                     anchors.horizontalCenter: parent.horizontalCenter
                     anchors.verticalCenter: parent.verticalCenter
-                    text: "Hide repeating values"
+                    text: qsTr("Hide repeating values")
                 }
             }
         }
@@ -401,7 +291,7 @@ MuseScore {
                     id: numbersMappingFileLabel
                     anchors.horizontalCenter: parent.horizontalCenter
                     anchors.verticalCenter: parent.verticalCenter
-                    text: qsTr("Numbers map file")+":"
+                    text: qsTr("Numbers Map File")+":"
                 }
             }
             
@@ -421,13 +311,13 @@ MuseScore {
 
             Button {
                 id: updateButton
-                text: "Update"
+                text: qsTr("Update")
                 onClicked: updateAll()
             }
 
             Button {
                 id: removeButton
-                text: "Remove"
+                text: qsTr("Remove")
                 onClicked: removeAll()
             }
         }
@@ -466,7 +356,7 @@ MuseScore {
 
     FileDialog {
         id: numbersMappingFileDialog
-        title: qsTr("Numbers Mapping File")
+        title: qsTr("Numbers Map File")
         selectExisting: true
         selectFolder: false
         selectMultiple: false
@@ -486,7 +376,7 @@ MuseScore {
 
     FileDialog {
         id: lettersMappingFileDialog
-        title: qsTr("Letters Mapping File")
+        title: qsTr("Letters Map File")
         selectExisting: true
         selectFolder: false
         selectMultiple: false
