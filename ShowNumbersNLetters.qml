@@ -20,10 +20,6 @@ MuseScore {
     property var numbersMapping
     property var updating: false
 
-    QProcess {
-        id: proc
-    }
-
     onRun: {
         processMappings()
     }
@@ -87,9 +83,7 @@ MuseScore {
         console.log("instrumentId "+instrumentId)
 
         var instInd = numbersMapping["instrumentIds"].findIndex((e)=> e==instrumentId)
-        console.log(instInd)
         if (instInd==-1) {
-            console.log("using default instrument at ind 0")
             instInd = 0
         }
 
@@ -391,6 +385,34 @@ MuseScore {
                     text: "Hide repeating values"
                 }
             }
+        }
+        GridLayout {
+            id: mappingFilesContainer
+            anchors.margins: 4
+            columns: 2
+
+
+            Rectangle {
+                width: childrenRect.width + 20
+                height: childrenRect.height + 10
+                anchors.verticalCenter: buttonNumbersMappingFile.verticalCenter
+
+                Label {
+                    id: numbersMappingFileLabel
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    anchors.verticalCenter: parent.verticalCenter
+                    text: qsTr("Numbers map file")+":"
+                }
+            }
+            
+            Button {
+                id : buttonNumbersMappingFile
+                text: qsTr(numberMappingFilePath.substr(numberMappingFilePath.lastIndexOf("/")+1))
+                onClicked: {
+                    console.log("select mapping file")
+                    numbersMappingFileDialog.open()
+                }
+            }
 
         }
 
@@ -504,145 +526,5 @@ MuseScore {
         xhr1.send()
     }
 
-
-        
-        
-    function numbers(pitch) {
-        switch (pitch) {
-            case 54: return "1/2/3"
-            case 55: return "1/3"
-            case 56: return "2/3"
-            case 57: return "½"
-            case 58: return "1"
-            case 59: return "2"
-            case 60: return "L"
-            case 61: return "1/2/3"
-            case 62: return "1/3"
-            case 63: return "2/3"
-            case 64: return "½"
-            case 65: return "1"
-            case 66: return "2"
-            case 67: return "L"
-            case 68: return "2/3"
-            case 69: return "½"
-            case 70: return "1"
-            case 71: return "2"
-            case 72: return "L"
-            case 73: return "½"
-            case 74: return "1"
-            case 75: return "2"
-            case 76: return "L"
-            case 77: return "1"
-            case 78: return "2"
-            case 79: return "L"
-            case 80: return "2/3"
-            case 81: return "½"
-            case 82: return "1"
-            case 83: return "2"
-            case 84: return "L"
-            default: ""
-        }
-    }
-
-    function letters(tpitch, cur) {
-        if (useSharps(cur)) {
-            return lettersSharp(tpitch)
-        } else {
-            return lettersFlat(tpitch)
-        }
-    }
-
-    function useSharps(cur) {
-        if (sharpOrFlatSelection.get(sharpOrFlatSelectionBox.currentIndex).value=="auto") {
-            if (cur.keySignature<0) {
-                return false
-            } else {
-                return true
-            }
-        } else if (sharpOrFlatSelection.get(sharpOrFlatSelectionBox.currentIndex).value=="sharp") {
-            return true
-        } else if (sharpOrFlatSelection.get(sharpOrFlatSelectionBox.currentIndex).value=="flat") {
-            return false
-        }
-    }
-    
-    function lettersSharp(pitch) {
-        switch (pitch) {
-            case 54: return "Fis"
-            case 55: return "G"
-            case 56: return "Gis"
-            case 57: return "A"
-            case 58: return "Ais"
-            case 59: return "H"
-            case 60: return "C"
-            case 61: return "Cis"
-            case 62: return "D"
-            case 63: return "Dis"
-            case 64: return "E"
-            case 65: return "F"
-            case 66: return "Fis"
-            case 67: return "G"
-            case 68: return "Gis"
-            case 69: return "A"
-            case 70: return "Ais"
-            case 71: return "H"
-            case 72: return "C"
-            case 73: return "Cis"
-            case 74: return "D"
-            case 75: return "Dis"
-            case 76: return "E"
-            case 77: return "F"
-            case 78: return "Fis"
-            case 79: return "G"
-            case 80: return "Gis"
-            case 81: return "A"
-            case 82: return "Ais"
-            case 83: return "H"
-            case 84: return "C"
-            default: ""
-        }
-    }
-    
-    
-    
-    function lettersFlat(pitch) {
-        switch (pitch) {
-            case 54: return "Ges"
-            case 55: return "G"
-            case 56: return "As"
-            case 57: return "A"
-            case 58: return "B"
-            case 59: return "H"
-            case 60: return "C"
-            case 61: return "Des"
-            case 62: return "D"
-            case 63: return "Es"
-            case 64: return "E"
-            case 65: return "F"
-            case 66: return "Ges"
-            case 67: return "G"
-            case 68: return "As"
-            case 69: return "A"
-            case 70: return "B"
-            case 71: return "H"
-            case 72: return "C"
-            case 73: return "Des"
-            case 74: return "D"
-            case 75: return "Es"
-            case 76: return "E"
-            case 77: return "F"
-            case 78: return "Ges"
-            case 79: return "G"
-            case 80: return "As"
-            case 81: return "A"
-            case 82: return "B"
-            case 83: return "H"
-            case 84: return "C"
-            default: ""
-        }
-    }
-    
-    
-        
 }
 
