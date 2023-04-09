@@ -82,7 +82,7 @@ MuseScore {
         var instrumentId = staff.part.instruments[0].instrumentId
         console.log("instrumentId "+instrumentId)
 
-        var instInd = numbersMapping["instrumentIds"].findIndex((e)=> e==instrumentId)
+        var instInd = numbersMapping["instrumentIds"].findIndex(function(e) {return e==instrumentId})
         if (instInd==-1) {
             instInd = 0
         }
