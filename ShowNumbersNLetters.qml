@@ -14,9 +14,9 @@ MuseScore {
     id: window
 
     property var output
-    property string fisLettersMappingFilePath : "./mappings/letters_fis_mapping_default_de.json"
+    property string fisLettersMappingFilePath : "./mappings/letters_sharps_mapping_default_de.json"
     property var fisLettersMapping
-    property string bLettersMappingFilePath : "./mappings/letters_b_mapping_default_de.json"
+    property string bLettersMappingFilePath : "./mappings/letters_flats_mapping_default_de.json"
     property var bLettersMapping
     property string numberMappingFilePath : "./mappings/numbers_mapping_default.json"
     property var numbersMapping
@@ -287,7 +287,7 @@ MuseScore {
 
             Label {
                 id: fisLettersMappingFileLabel
-                text: qsTr("Letters (Fis) Map File")+":"
+                text: qsTr("Letters (sharps) Map File")+":"
             }
             
             Button {
@@ -301,7 +301,7 @@ MuseScore {
 
             Label {
                 id: bLettersMappingFileLabel
-                text: qsTr("Letters (b) Map File")+":"
+                text: qsTr("Letters (flats) Map File")+":"
             }
             
             Button {
