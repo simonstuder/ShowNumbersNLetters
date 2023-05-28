@@ -278,7 +278,7 @@ MuseScore {
             
             Button {
                 id : buttonNumbersMappingFile
-                text: qsTr(numberMappingFilePath.substr(numberMappingFilePath.lastIndexOf("/")+1))
+                text: numberMappingFilePath.substr(numberMappingFilePath.lastIndexOf("/")+1)
                 onClicked: {
                     console.log("select mapping file")
                     numbersMappingFileDialog.open()
@@ -292,7 +292,7 @@ MuseScore {
             
             Button {
                 id : buttonLettersMappingFileFis
-                text: qsTr(fisLettersMappingFilePath.substr(fisLettersMappingFilePath.lastIndexOf("/")+1))
+                text: fisLettersMappingFilePath.substr(fisLettersMappingFilePath.lastIndexOf("/")+1)
                 onClicked: {
                     console.log("select fis letters mapping file")
                     fisLettersMappingFileDialog.open()
@@ -306,7 +306,7 @@ MuseScore {
             
             Button {
                 id : buttonLettersMappingFileB
-                text: qsTr(bLettersMappingFilePath.substr(bLettersMappingFilePath.lastIndexOf("/")+1))
+                text: bLettersMappingFilePath.substr(bLettersMappingFilePath.lastIndexOf("/")+1)
                 onClicked: {
                     console.log("select b letters mapping file")
                     bLettersMappingFileDialog.open()
@@ -435,7 +435,7 @@ MuseScore {
 
     FileDialog {
         id: fisLettersMappingFileDialog
-        title: qsTr("Letters (Fis) Map File")
+        title: qsTr("Letters (sharps) Map File")
         selectExisting: true
         selectFolder: false
         selectMultiple: false
@@ -455,7 +455,7 @@ MuseScore {
 
     FileDialog {
         id: bLettersMappingFileDialog
-        title: qsTr("Letters (b) Map File")
+        title: qsTr("Letters (flats) Map File")
         selectExisting: true
         selectFolder: false
         selectMultiple: false
