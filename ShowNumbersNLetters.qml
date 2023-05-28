@@ -14,11 +14,15 @@ MuseScore {
     id: window
 
     property var output
-    property string letterMappingFilePath : "mappings/letters_mapping_default_de.json"
-    property var lettersMapping
-    property string numberMappingFilePath : "mappings/numbers_mapping_default.json"
+    property string fisLettersMappingFilePath : "./mappings/letters_fis_mapping_default_de.json"
+    property var fisLettersMapping
+    property string bLettersMappingFilePath : "./mappings/letters_b_mapping_default_de.json"
+    property var bLettersMapping
+    property string numberMappingFilePath : "./mappings/numbers_mapping_default.json"
     property var numbersMapping
     property var updating: false
+
+    property var lettersMode: false
 
     onRun: {
         processMappings()
@@ -64,7 +68,7 @@ MuseScore {
         }
     }
 
-    function updateStaff(staffIndex) {
+    function updateStaff(staffIndex,mapping) {
         console.log("update staff "+staffIndex)
         var cursor = curScore.newCursor()
 
@@ -82,7 +86,7 @@ MuseScore {
         var instrumentId = staff.part.instruments[0].instrumentId
         console.log("instrumentId "+instrumentId)
 
-        var instInd = numbersMapping["instrumentIds"].findIndex(function(e) {return e==instrumentId})
+        var instInd = mapping["instrumentIds"].findIndex(function(e) {return e==instrumentId})
         if (instInd==-1) {
             instInd = 0
         }
@@ -105,7 +109,7 @@ MuseScore {
                     }
                 }
                 if (lowestNote) {
-                    var text = numbersMapping[(lowestPitch).toString()][instInd]
+                    var text = mapping[(lowestPitch).toString()][instInd]
                     var hasTieBack = lowestNote.tieBack != null
                     if ((!hideRepeatingValuesCheckBox.checked || text != last_text) && !hasTieBack) {
                         last_text = text
@@ -155,6 +159,20 @@ MuseScore {
         updating = false
     }
 
+    function useSharps(cur) {
+        if (sharpOrFlatSelection.get(sharpOrFlatSelectionBox.currentIndex).value=="auto") {
+            if (cur.keySignature<0) {
+                return false
+            } else {
+                return true
+            }
+        } else if (sharpOrFlatSelection.get(sharpOrFlatSelectionBox.currentIndex).value=="sharp") {
+            return true
+        } else if (sharpOrFlatSelection.get(sharpOrFlatSelectionBox.currentIndex).value=="flat") {
+            return false
+        }
+    }
+
     function updateAll() {
         removeAll()
         if (updating) {
@@ -164,10 +182,22 @@ MuseScore {
         console.log("update")
         curScore.startCmd()
 
+        var mapping
+        if (lettersMode) {
+            var c = curScore.newCursor()
+            if (useSharps(c)) {
+                mapping = fisLettersMapping
+            } else {
+                mapping = bLettersMapping
+            }
+        } else {
+            mapping = numbersMapping
+        }
+
         var selectedStaffs = getSelectedStaffsOrAllInd()
         console.log("selected staffs "+selectedStaffs)
         for (var i=0; i<selectedStaffs.length; i++) {
-            updateStaff(selectedStaffs[i])
+            updateStaff(selectedStaffs[i],mapping)
         }
 
         curScore.endCmd()
@@ -230,69 +260,20 @@ MuseScore {
     }
 
     GridLayout {
-        anchors.margins:10
+        anchors.margins: 10
         columns: 1
+        columnSpacing: 10
+        rowSpacing: 10
 
-        GridLayout {
-            id: settingsContainer
-            anchors.margins: 4
-            columns: 2
-
-            /*
-            CheckBox {
-                id: showNumbersCheckBox
-                checked: true
-                onCheckedChanged: function () {
-                    console.log("changed showNumbers")
-                }
-            }
-            Rectangle {
-                width: childrenRect.width + 20
-                height: childrenRect.height + 10
-
-                Label {
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    anchors.verticalCenter: parent.verticalCenter
-                    text: qsTr("Show Numbers")
-                }
-            }
-            */
-
-            CheckBox {
-                id: hideRepeatingValuesCheckBox
-                checked: false
-                onCheckedChanged: function () {
-                    updateAll()
-                }
-            }
-            Rectangle {
-                width: childrenRect.width + 20
-                height: childrenRect.height + 10
-
-                Label {
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    anchors.verticalCenter: parent.verticalCenter
-                    text: qsTr("Hide repeating values")
-                }
-            }
-        }
         GridLayout {
             id: mappingFilesContainer
-            anchors.margins: 4
             columns: 2
+            columnSpacing: 10
+            rowSpacing: 4
 
-
-            Rectangle {
-                width: childrenRect.width + 20
-                height: childrenRect.height + 10
-                anchors.verticalCenter: buttonNumbersMappingFile.verticalCenter
-
-                Label {
-                    id: numbersMappingFileLabel
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    anchors.verticalCenter: parent.verticalCenter
-                    text: qsTr("Numbers Map File")+":"
-                }
+            Label {
+                id: numbersMappingFileLabel
+                text: qsTr("Numbers Map File")+":"
             }
             
             Button {
@@ -304,15 +285,93 @@ MuseScore {
                 }
             }
 
+            Label {
+                id: fisLettersMappingFileLabel
+                text: qsTr("Letters (Fis) Map File")+":"
+            }
+            
+            Button {
+                id : buttonLettersMappingFileFis
+                text: qsTr(fisLettersMappingFilePath.substr(fisLettersMappingFilePath.lastIndexOf("/")+1))
+                onClicked: {
+                    console.log("select fis letters mapping file")
+                    fisLettersMappingFileDialog.open()
+                }
+            }
+
+            Label {
+                id: bLettersMappingFileLabel
+                text: qsTr("Letters (b) Map File")+":"
+            }
+            
+            Button {
+                id : buttonLettersMappingFileB
+                text: qsTr(bLettersMappingFilePath.substr(bLettersMappingFilePath.lastIndexOf("/")+1))
+                onClicked: {
+                    console.log("select b letters mapping file")
+                    bLettersMappingFileDialog.open()
+                }
+            }
+
+            Label {
+                id: sharpOrFlatLabel
+                text: qsTr("Use sharps or flats")
+            }
+            ComboBox {
+                id: sharpOrFlatSelectionBox
+                anchors.margins: 10
+                textRole: "text"
+                currentIndex: 0
+                model: ListModel {
+                    id: sharpOrFlatSelection
+                    ListElement { text: "auto"; value: "auto" }
+                    ListElement { text: qsTr("sharps"); value: "sharp" }
+                    ListElement { text: qsTr("flats"); value: "flat" }
+                }
+                width: 90
+                onCurrentIndexChanged: function () {
+                }
+            }
+
+        }
+
+        GridLayout {
+            id: settingsContainer
+            columns: 2
+            rows: 1
+            columnSpacing: 10
+
+            CheckBox {
+                id: hideRepeatingValuesCheckBox
+                checked: false
+                onCheckedChanged: function () {
+                    updateAll()
+                }
+            }
+            Label {
+                text: qsTr("Hide repeating values")
+            }
         }
 
         GridLayout {
             rows: 1
 
             Button {
-                id: updateButton
-                text: qsTr("Update")
-                onClicked: updateAll()
+                id: updateNumbersButton
+                text: qsTr("Update Numbers")
+                onClicked: function() {
+                    lettersMode = false
+                    updateAll()
+                }
+            }
+
+            Button {
+                id: updateLettersButton
+                text: qsTr("Update Letters")
+                onClicked: function() {
+                    lettersMode = true
+                    updateAll()
+                }
             }
 
             Button {
@@ -375,19 +434,39 @@ MuseScore {
     }
 
     FileDialog {
-        id: lettersMappingFileDialog
-        title: qsTr("Letters Map File")
+        id: fisLettersMappingFileDialog
+        title: qsTr("Letters (Fis) Map File")
         selectExisting: true
         selectFolder: false
         selectMultiple: false
         folder: shortcuts.home
         onAccepted: {
-            var filename = lettersMappingFileDialog.fileUrl.toString()
+            var filename = fisLettersMappingFileDialog.fileUrl.toString()
             
             if(filename){
                 filename = getLocalPath(filename)
                 console.log("selected "+filename)
-                letterMappingFilePath = filename
+                fisLettersMappingFilePath = filename
+
+                processMappings()
+            }
+        }
+    }
+
+    FileDialog {
+        id: bLettersMappingFileDialog
+        title: qsTr("Letters (b) Map File")
+        selectExisting: true
+        selectFolder: false
+        selectMultiple: false
+        folder: shortcuts.home
+        onAccepted: {
+            var filename = bLettersMappingFileDialog.fileUrl.toString()
+            
+            if(filename){
+                filename = getLocalPath(filename)
+                console.log("selected "+filename)
+                bLettersMappingFilePath = filename
 
                 processMappings()
             }
@@ -399,21 +478,47 @@ MuseScore {
         xhr.open("GET", numberMappingFilePath)
         xhr.onreadystatechange = function() {
             if (xhr.readyState == XMLHttpRequest.DONE) {
-                numbersMapping = JSON.parse(xhr.responseText)
-                console.log("updated numbers mapping")
+                //console.log(xhr.responseText)
+                try {
+                    numbersMapping = JSON.parse(xhr.responseText)
+                    console.log("updated numbers mapping")
+                } catch (e) {
+                    console.error("could not load numbers mapping")
+                    return
+                }
             }
         }
         xhr.send()
 
         var xhr1 = new XMLHttpRequest
-        xhr1.open("GET", letterMappingFilePath)
+        xhr1.open("GET", fisLettersMappingFilePath)
         xhr1.onreadystatechange = function() {
             if (xhr1.readyState == XMLHttpRequest.DONE) {
-                lettersMapping = JSON.parse(xhr1.responseText)
-                console.log("updated letters mapping")
+                try {
+                fisLettersMapping = JSON.parse(xhr1.responseText)
+                console.log("updated fis letters mapping")
+                } catch (e) {
+                    console.error("could not load fis letters mapping")
+                    return
+                }
             }
         }
         xhr1.send()
+
+        var xhr2 = new XMLHttpRequest
+        xhr2.open("GET", bLettersMappingFilePath)
+        xhr2.onreadystatechange = function() {
+            if (xhr2.readyState == XMLHttpRequest.DONE) {
+                try {
+                    bLettersMapping = JSON.parse(xhr2.responseText)
+                    console.log("updated b letters mapping")
+                } catch (e) {
+                    console.error("could not load b letters mapping")
+                    return
+                }
+            }
+        }
+        xhr2.send()
     }
 
 }
