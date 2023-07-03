@@ -424,8 +424,7 @@ MuseScore {
             var filename = numbersMappingFileDialog.fileUrl.toString()
             
             if(filename){
-                filename = getLocalPath(filename)
-                console.log("selected "+filename)
+                console.log("selected "+getLocalPath(filename))
                 numberMappingFilePath = filename
 
                 processMappings()
@@ -444,8 +443,7 @@ MuseScore {
             var filename = fisLettersMappingFileDialog.fileUrl.toString()
             
             if(filename){
-                filename = getLocalPath(filename)
-                console.log("selected "+filename)
+                console.log("selected "+getLocalPath(filename))
                 fisLettersMappingFilePath = filename
 
                 processMappings()
@@ -464,8 +462,7 @@ MuseScore {
             var filename = bLettersMappingFileDialog.fileUrl.toString()
             
             if(filename){
-                filename = getLocalPath(filename)
-                console.log("selected "+filename)
+                console.log("selected "+getLocalPath(filename))
                 bLettersMappingFilePath = filename
 
                 processMappings()
@@ -474,15 +471,10 @@ MuseScore {
     }
 
     function processMappings() {
-        var pathPrefix = ""
-        if (Qt.platform.os == "windows") {
-            pathPrefix = "file:///"
-        }
 
         var xhr = new XMLHttpRequest
         xhr.onreadystatechange = function() {
             if (xhr.readyState == XMLHttpRequest.DONE) {
-                //console.log(xhr.responseText)
                 try {
                     numbersMapping = JSON.parse(xhr.responseText)
                     console.log("updated numbers mapping")
@@ -493,7 +485,7 @@ MuseScore {
                 }
             }
         }
-        xhr.open("GET", pathPrefix+numberMappingFilePath)
+        xhr.open("GET", numberMappingFilePath)
         xhr.send()
 
         var xhr1 = new XMLHttpRequest
@@ -509,7 +501,7 @@ MuseScore {
                 }
             }
         }
-        xhr1.open("GET", pathPrefix+fisLettersMappingFilePath)
+        xhr1.open("GET", fisLettersMappingFilePath)
         xhr1.send()
 
         var xhr2 = new XMLHttpRequest
@@ -525,7 +517,7 @@ MuseScore {
                 }
             }
         }
-        xhr2.open("GET", pathPrefix+bLettersMappingFilePath)
+        xhr2.open("GET", bLettersMappingFilePath)
         xhr2.send()
     }
 
