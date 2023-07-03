@@ -475,7 +475,6 @@ MuseScore {
 
     function processMappings() {
         var xhr = new XMLHttpRequest
-        xhr.open("GET", numberMappingFilePath)
         xhr.onreadystatechange = function() {
             if (xhr.readyState == XMLHttpRequest.DONE) {
                 //console.log(xhr.responseText)
@@ -484,14 +483,15 @@ MuseScore {
                     console.log("updated numbers mapping")
                 } catch (e) {
                     console.error("could not load numbers mapping")
+                    console.error(e)
                     return
                 }
             }
         }
+        xhr.open("GET", "file:///"+numberMappingFilePath)
         xhr.send()
 
         var xhr1 = new XMLHttpRequest
-        xhr1.open("GET", fisLettersMappingFilePath)
         xhr1.onreadystatechange = function() {
             if (xhr1.readyState == XMLHttpRequest.DONE) {
                 try {
@@ -499,14 +499,15 @@ MuseScore {
                 console.log("updated fis letters mapping")
                 } catch (e) {
                     console.error("could not load fis letters mapping")
+                    console.error(e)
                     return
                 }
             }
         }
+        xhr1.open("GET", "file:///"+fisLettersMappingFilePath)
         xhr1.send()
 
         var xhr2 = new XMLHttpRequest
-        xhr2.open("GET", bLettersMappingFilePath)
         xhr2.onreadystatechange = function() {
             if (xhr2.readyState == XMLHttpRequest.DONE) {
                 try {
@@ -514,10 +515,12 @@ MuseScore {
                     console.log("updated b letters mapping")
                 } catch (e) {
                     console.error("could not load b letters mapping")
+                    console.error(e)
                     return
                 }
             }
         }
+        xhr2.open("GET", "file:///"+bLettersMappingFilePath)
         xhr2.send()
     }
 
