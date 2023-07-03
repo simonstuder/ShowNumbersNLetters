@@ -474,6 +474,11 @@ MuseScore {
     }
 
     function processMappings() {
+        var pathPrefix = ""
+        if (Qt.platform.os == "windows") {
+            pathPrefix = "file:///"
+        }
+
         var xhr = new XMLHttpRequest
         xhr.onreadystatechange = function() {
             if (xhr.readyState == XMLHttpRequest.DONE) {
@@ -488,7 +493,7 @@ MuseScore {
                 }
             }
         }
-        xhr.open("GET", "file:///"+numberMappingFilePath)
+        xhr.open("GET", pathPrefix+numberMappingFilePath)
         xhr.send()
 
         var xhr1 = new XMLHttpRequest
@@ -504,7 +509,7 @@ MuseScore {
                 }
             }
         }
-        xhr1.open("GET", "file:///"+fisLettersMappingFilePath)
+        xhr1.open("GET", pathPrefix+fisLettersMappingFilePath)
         xhr1.send()
 
         var xhr2 = new XMLHttpRequest
@@ -520,7 +525,7 @@ MuseScore {
                 }
             }
         }
-        xhr2.open("GET", "file:///"+bLettersMappingFilePath)
+        xhr2.open("GET", pathPrefix+bLettersMappingFilePath)
         xhr2.send()
     }
 
